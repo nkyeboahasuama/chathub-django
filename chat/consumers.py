@@ -4,6 +4,9 @@ import json
 import uuid
 
 from asgiref.sync import async_to_sync
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ChatConsumer(WebsocketConsumer):
     # def __init__(self, *args, **kwargs):
@@ -11,35 +14,51 @@ class ChatConsumer(WebsocketConsumer):
     #     self.user_id = str(uuid.uuid4())
 
     def connect(self):
-        
+
+        self.accept()
         self.user_id = str(uuid.uuid4())
         self.room_group_name ='test'
 
+        print("Conn")
+        print()
         async_to_sync(self.channel_layer.group_add)(self.room_group_name, self.channel_name)
-
-        self.accept()
 
         self.send(json.dumps({
             'type':'user_id',
             'user_id':self.user_id
         }))
+        # self.send(json.dumps({
+        #     'type': 'initial_data',
+        #     'data': user_key
+        # }))
 
+
+    # def disconnect(self, close_code):
+        # pass
 
     def disconnect(self, close_code):
-        pass
+        async_to_sync(self.channel_layer.group_discard)(self.room_group_name, self.channel_name)
+
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         sender = text_data_json['sender']
+        senderId = text_data_json['senderId']
+
+        received_data = json.loads(text_data)
+        user_key = received_data.get('userKey')
         
-        print(f"User ID: {self.user_id}")
+        # print(f"User ID: {self.user_id}")
+        # print(f"User Key: {sender}")
+        print(message)
         
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,{
                 'type':'chat_message',
                 'message':message,
-                'sender': sender
+                'sender': sender,
+                'senderId':senderId
             }
         )
         # Handle received WebSocket 
@@ -47,12 +66,14 @@ class ChatConsumer(WebsocketConsumer):
     def chat_message(self,event):
         message = event['message']
         sender = event['sender']
-        print(f"Sender:{sender}")
-        print(event)
+        senderId = event['senderId']
+        # print(f"Sender:{sender}")
+        # print(event)
 
         self.send(text_data=json.dumps({'type':'chat',
         'message':message,
-        'sender': sender
+        'sender': sender,
+        "senderId":senderId
         }))
 
     async def send_message(self, event):

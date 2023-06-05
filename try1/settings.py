@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'daphne',
+    'corsheaders',
     
     'django.contrib.admin',
     'django.contrib.auth',
@@ -59,7 +60,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = False  # Allow requests from all origins (you can modify this as per your requirements)
+CORS_ALLOW_CREDENTIALS = True  # Allow sending cookies with the requests (if needed)
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+]
+
+
 
 ROOT_URLCONF = 'try1.urls'
 
