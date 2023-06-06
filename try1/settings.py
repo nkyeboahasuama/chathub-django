@@ -25,13 +25,14 @@ SECRET_KEY = 'django-insecure-y9h(7b0efy5_eecf!odz$8f5q58n)4q7#@(2t(za-o-v1-fc64
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.vercel.app']
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'daphne',
+    'corsheaders',
     
     'django.contrib.admin',
     'django.contrib.auth',
@@ -45,10 +46,18 @@ INSTALLED_APPS = [
 
 ASGI_APPLICATION = 'try1.asgi.application'
 
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer"
+#     }
+# }
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
 }
 
 MIDDLEWARE = [
@@ -59,7 +68,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = False  # Allow requests from all origins (you can modify this as per your requirements)
+CORS_ALLOW_CREDENTIALS = True  # Allow sending cookies with the requests (if needed)
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+]
+
+
 
 ROOT_URLCONF = 'try1.urls'
 
