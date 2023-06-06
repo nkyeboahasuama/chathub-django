@@ -19,8 +19,6 @@ class ChatConsumer(WebsocketConsumer):
         self.user_id = str(uuid.uuid4())
         self.room_group_name ='test'
 
-        print("Conn")
-        print()
         async_to_sync(self.channel_layer.group_add)(self.room_group_name, self.channel_name)
 
         self.send(json.dumps({
@@ -45,20 +43,22 @@ class ChatConsumer(WebsocketConsumer):
         message = text_data_json['message']
         sender = text_data_json['sender']
         senderId = text_data_json['senderId']
+        time = text_data_json['time']
 
-        received_data = json.loads(text_data)
-        user_key = received_data.get('userKey')
+        # received_data = json.loads(text_data)
+        # user_key = received_data.get('userKey')
         
         # print(f"User ID: {self.user_id}")
         # print(f"User Key: {sender}")
-        print(message)
+        # print(message)
         
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,{
                 'type':'chat_message',
                 'message':message,
                 'sender': sender,
-                'senderId':senderId
+                'senderId':senderId,
+                'time':time
             }
         )
         # Handle received WebSocket 
@@ -67,13 +67,15 @@ class ChatConsumer(WebsocketConsumer):
         message = event['message']
         sender = event['sender']
         senderId = event['senderId']
+        time = event['time']
         # print(f"Sender:{sender}")
-        # print(event)
+        print(time)
 
         self.send(text_data=json.dumps({'type':'chat',
         'message':message,
         'sender': sender,
-        "senderId":senderId
+        "senderId":senderId,
+        "time":time
         }))
 
     async def send_message(self, event):
