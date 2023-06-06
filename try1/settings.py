@@ -75,7 +75,7 @@ CORS_ORIGIN_ALLOW_ALL = False  # Allow requests from all origins (you can modify
 CORS_ALLOW_CREDENTIALS = True  # Allow sending cookies with the requests (if needed)
 
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
+    "https://647f53be59a73d000807c78e--sprightly-kheer-7da487.netlify.app"
 ]
 
 
